@@ -13,27 +13,36 @@ variables to the screen.
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
-#include <iomanip>
 #include <tuple>
 #include <vector>
 
 /*
-readData function, takes in a file name as a string. Then it attempts to open the file and read data from the file in the given format.
-Then it returns a tuple containing a vector for the data in the file and the dimention of the matrix read in.
+readData function, takes in a file name as a string for both the prodvec and sysmat files. Then it attempts to open the file and read data from the 
+file in the given format. Then it returns a tuple containing a vector for the data in the file and the dimension of the matrix read in.
 */
-std::tuple<std::vector<float>, float> readData(std::string fileName) {
+std::tuple<std::vector<float>, int> readData(std::string fileName, std::string productFileName) {
     std::vector<float> matrix;
     std::fstream file;
+    std::fstream file2;
     std::string line;
-    float dimensions;
+    int dimensions;
 
     file.open(fileName);
+    file2.open(productFileName);
 
-    if(file.is_open()) {
+    if(file.is_open() && file2.is_open()) {
         std::getline(file, line, ' ');
         dimensions = stoi(line);
+        std::getline(file2, line, ' ');
+        if(dimensions != stoi(line)) {
+            throw std::invalid_argument("Matrix dimensions don't match!");
+        }
         while(!file.eof()) {
-            std::getline(file, line, ' ');
+            for(int i = 0; i < dimensions; i++) {
+                std::getline(file, line, ' ');
+                matrix.push_back(stof(line));
+            }
+            std::getline(file2, line, ' ');
             matrix.push_back(stof(line));
         }
     }
@@ -42,6 +51,7 @@ std::tuple<std::vector<float>, float> readData(std::string fileName) {
     }
 
     file.close();
+    file2.close();
 
     return std::make_tuple(matrix, dimensions);
 }
@@ -50,7 +60,7 @@ std::tuple<std::vector<float>, float> readData(std::string fileName) {
 gaussianElimination function takes in a vector and the dimentions for the matrix and then attempts to perform gaussian elimination on the
 matrix and solving the system of equations. 
 */
-std::vector<float> gaussianElimination(std::vector<float> matrix, std::vector<float> product, int dimensions) {
+std::vector<float> gaussianElimination(std::vector<float> matrix, int dimensions) {
     std::vector<float> newMatrix;
     std::vector<float>::iterator it = matrix.begin();
     std::vector<float>::iterator nextColumn = it+dimensions;
@@ -82,20 +92,18 @@ std::vector<float> gaussianElimination(std::vector<float> matrix, std::vector<fl
 }
 
 /*
-printMatrix function takes in two vectors for the matrix and the product and an integer, then it attempts to output the matrix to the users screen
+printMatrix function takes in a vectors for the matrix and an integer for the dimensions, then it attempts to output the matrix to the users screen
 with the regular matrix and the product matrix conjoined in one grid.
 */
-void printMatrix(std::vector<float> matrix, std::vector<float> product, int dimensions) {
+void printMatrix(std::vector<float> matrix, int dimensions) {
     int count = 0;
-    std::vector<float>::iterator pit = product.begin();
     for (std::vector<float>::iterator it = matrix.begin(); it != matrix.end(); it++) {
-        if(count < dimensions-1) {
-            std::cout << *it << ' ';
+        if(count < dimensions) {
+            std::cout << *it << ", ";
             count++;
         }
         else {
-            std::cout << *it << " | " << *pit <<std::endl;
-            *pit++;
+            std::cout << " | " << *it <<std::endl;
             count = 0;
         }
     }
@@ -106,21 +114,19 @@ Start of the main function for the program
 */
 int main() {
     std::vector<float> matrix;
-    std::vector<float> product;
-    int matrixDimentions, productDimentions = 0;
+    int matrixDimentions = 0;
 
     std::cout << "Matrix 1" << std::endl;
-    std::tie(matrix, matrixDimentions) = readData("sysmat1.txt");
-    std::tie(product, productDimentions) = readData("prodvec1.txt");
-    printMatrix(matrix, product, matrixDimentions);
-    gaussianElimination(matrix, product, matrixDimentions);
+    std::tie(matrix, matrixDimentions) = readData("sysmat1.txt", "prodvec1.txt");
+    printMatrix(matrix, matrixDimentions);
+    gaussianElimination(matrix, matrixDimentions);
+    
     /*
-    Do Gaussian elimination
+    std::cout << "Matrix 2" << std::endl;
+    std::tie(matrix, matrixDimentions) = readData("sysmat2.txt", "prodvec2.txt");
+    printMatrix(matrix, matrixDimentions);
+    gaussianElimination(matrix, matrixDimentions);
     */
-    //std::cout << "Matrix 2" << std::endl;
-    //std::tie(matrix, matrixDimentions) = readData("sysmat2.txt");
-    //std::tie(product, productDimentions) = readData("prodvec2.txt");
-    //printMatrix(matrix, product, matrixDimentions);
     /*
     Do Gaussian elimination
     */
