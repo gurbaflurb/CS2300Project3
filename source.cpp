@@ -17,13 +17,6 @@ variables to the screen.
 #include <tuple>
 #include <vector>
 
-std::tuple<std::vector<float>, int> readData(std::string fileName, std::string productFileName);
-void printMatrix(std::vector<float> &matrix, int dimensions);
-void printMatrix(std::vector<float> &matrix, int dimensions);
-std::vector<float> makeRow(std::vector<float>::iterator firstColumn, std::vector<float>::iterator secondColumn, int dimensions, int passThrough);
-void pivot(std::vector<float> &matrix, int dimensions);
-std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimensions);
-
 /*
 readData function, takes in a file name as a string for both the prodvec and sysmat files. Then it attempts to open the file and read data from the 
 file in the given format. Then it returns a tuple containing a vector for the data in the file and the dimension of the matrix read in.
@@ -108,7 +101,7 @@ void pivot(std::vector<float> &matrix, int dimensions) {
     std::vector<float>::iterator firstRow = matrix.begin();
     std::vector<float>::iterator nextRow = matrix.begin()+dimensions+1;
     float temp;
-    for(int i = 0; i < dimensions; i++) {
+    for(int i = 0; i < dimensions-1; i++) {
         if(std::abs(*firstRow) < std::abs(*nextRow)) {
             for(int j = 0; j <= dimensions; j++) {
                 temp = *(nextRow+j);
@@ -118,7 +111,6 @@ void pivot(std::vector<float> &matrix, int dimensions) {
         }
         nextRow += dimensions+1;
     }
-
 }
 
 /*
@@ -131,9 +123,9 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
     pivot(matrix, dimensions);
     std::cout << "\nAfter pivot" << std::endl;
     printMatrix(matrix, dimensions);
-    //std::vector<float>::iterator it = matrix.begin();
-    //std::vector<float>::iterator nextColumn = it+dimensions+1;
-    /*
+    std::vector<float>::iterator it = matrix.begin();
+    std::vector<float>::iterator nextColumn = it+dimensions+1;
+    
     for(int i = 0; i < dimensions+1; i++) {
         newMatrix.push_back(*(it+i));
     }
@@ -151,7 +143,7 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
         it = nextColumn;
         nextColumn +=dimensions+1;
     }
-    */
+    
     return newMatrix;
 }
 
@@ -163,7 +155,7 @@ int main() {
     int matrixDimentions = 0;
 
     std::cout << "Matrix 1" << std::endl;
-    tie(matrix, matrixDimentions) = readData("sysmat1.txt", "prodvec1.txt");
+    std::tie(matrix, matrixDimentions) = readData("sysmat1.txt", "prodvec1.txt");
     printMatrix(matrix, matrixDimentions);
     gaussianElimination(matrix, matrixDimentions);
     
