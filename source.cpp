@@ -117,18 +117,14 @@ void pivot(std::vector<float> &matrix, int dimensions) {
 gaussianElimination function takes in a vector and the dimensions for the matrix and then attempts to perform gaussian elimination on the
 matrix and solving the system of equations. 
 */
-std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimensions) {
-    std::vector<float> newMatrix;
+void gaussianElimination(std::vector<float> &matrix, int dimensions) {
     std::vector<float> tempMatrix;
     pivot(matrix, dimensions);
     std::cout << "\nAfter pivot" << std::endl;
     printMatrix(matrix, dimensions);
     std::vector<float>::iterator it = matrix.begin();
+    std::vector<float>::iterator next = it+dimensions+1;
     std::vector<float>::iterator nextColumn = it+dimensions+1;
-    
-    for(int i = 0; i < dimensions+1; i++) {
-        newMatrix.push_back(*(it+i));
-    }
     
     for (int i = 0; i < dimensions-1; i++) {
         for (int j = i; j < dimensions-1; j++) {
@@ -138,13 +134,12 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
             }
             nextColumn = nextColumn+dimensions+1;
         }
-        std::cout << "Matrix after Pass " << i+1 << std::endl;
+        std::cout << "\nMatrix after Pass " << i+1 << std::endl;
         printMatrix(matrix, dimensions);
-        it = nextColumn;
-        nextColumn +=dimensions+1;
+        it = next+1;
+        nextColumn = it+dimensions+1;
     }
-    
-    return newMatrix;
+
 }
 
 /*
@@ -158,6 +153,8 @@ int main() {
     std::tie(matrix, matrixDimentions) = readData("sysmat1.txt", "prodvec1.txt");
     printMatrix(matrix, matrixDimentions);
     gaussianElimination(matrix, matrixDimentions);
+    std::cout << "\nAfter Gaussian" << std::endl;
+    printMatrix(matrix, matrixDimentions);
     
     /*
     std::cout << "Matrix 2" << std::endl;
