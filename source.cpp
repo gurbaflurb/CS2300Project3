@@ -13,9 +13,9 @@ variables to the screen.
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
+#include <vector>
 #include <cmath>
 #include <tuple>
-#include <vector>
 
 /*
 readData function, takes in a file name as a string for both the prodvec and sysmat files. Then it attempts to open the file and read data from the 
@@ -117,7 +117,8 @@ void pivot(std::vector<float> &matrix, int dimensions) {
 gaussianElimination function takes in a vector and the dimensions for the matrix and then attempts to perform gaussian elimination on the
 matrix and solving the system of equations. 
 */
-void gaussianElimination(std::vector<float> &matrix, int dimensions) {
+std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimensions) {
+    std::vector<float> newMatrix;
     std::vector<float> tempMatrix;
     pivot(matrix, dimensions);
     std::cout << "\nAfter pivot" << std::endl;
@@ -139,7 +140,26 @@ void gaussianElimination(std::vector<float> &matrix, int dimensions) {
         it = next+1;
         nextColumn = it+dimensions+1;
     }
+    for(std::vector<float>::iterator iter = matrix.begin(); iter != matrix.end(); iter++) {
+        newMatrix.push_back(*iter);
+    }
+    return newMatrix;
+}
 
+void solveMatrix(std::vector<float> &matrix, int dimensions) {
+    float solvedValue[dimensions] = {1};
+    int count = 0;
+    
+    for (std::vector<float>::iterator it = matrix.end()-1; it != matrix.begin()-1; it--) {
+        solvedValue[count] = *it;
+        for(int i = 1; i < dimensions+1; i++) {
+            std::cout << "it+"<<i<<" =" << *(it-i) << std::endl;
+        }
+        std::cout << "Solved: " << solvedValue[count] << std::endl;
+        it -= dimensions;
+        count++;
+    }
+    
 }
 
 /*
@@ -152,10 +172,12 @@ int main() {
     std::cout << "Matrix 1" << std::endl;
     std::tie(matrix, matrixDimentions) = readData("sysmat1.txt", "prodvec1.txt");
     printMatrix(matrix, matrixDimentions);
-    gaussianElimination(matrix, matrixDimentions);
+    matrix = gaussianElimination(matrix, matrixDimentions);
     std::cout << "\nAfter Gaussian" << std::endl;
     printMatrix(matrix, matrixDimentions);
-    
+    std::cout << "Solved values from the matrix" << std::endl;
+    solveMatrix(matrix, matrixDimentions);
+
     /*
     std::cout << "Matrix 2" << std::endl;
     std::tie(matrix, matrixDimentions) = readData("sysmat2.txt", "prodvec2.txt");
