@@ -10,6 +10,7 @@ to find all the values for each of the variables. Then the program outputs the m
 variables to the screen.
 
 */
+#include <algorithm>
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
@@ -147,17 +148,30 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
 }
 
 void solveMatrix(std::vector<float> &matrix, int dimensions) {
-    float solvedValue[dimensions] = {1};
+    float solvedValue[dimensions];
+    float currentRow[dimensions];
+    std::fill_n(solvedValue, dimensions, 1);
     int count = 0;
-    
+
     for (std::vector<float>::iterator it = matrix.end()-1; it != matrix.begin()-1; it--) {
         solvedValue[count] = *it;
         for(int i = 1; i < dimensions+1; i++) {
-            std::cout << "it+"<<i<<" =" << *(it-i) << std::endl;
+            currentRow[i-1] = *(it-i);
         }
-        std::cout << "Solved: " << solvedValue[count] << std::endl;
+        for(int i = 0; i < dimensions; i++) {
+            if(i == count) {
+                continue;
+            }
+            else {
+                solvedValue[count] += currentRow[i];
+            }
+        }
+        solvedValue[count] = solvedValue[count]/currentRow[count];
         it -= dimensions;
         count++;
+    }
+    for(int i = dimensions-1; i > -1; i--) {
+        std::cout << solvedValue[i] << std::endl;
     }
     
 }
@@ -175,14 +189,18 @@ int main() {
     matrix = gaussianElimination(matrix, matrixDimentions);
     std::cout << "\nAfter Gaussian" << std::endl;
     printMatrix(matrix, matrixDimentions);
-    std::cout << "Solved values from the matrix" << std::endl;
+    std::cout << "\nSolved values from the matrix" << std::endl;
     solveMatrix(matrix, matrixDimentions);
 
     /*
     std::cout << "Matrix 2" << std::endl;
     std::tie(matrix, matrixDimentions) = readData("sysmat2.txt", "prodvec2.txt");
     printMatrix(matrix, matrixDimentions);
-    gaussianElimination(matrix, matrixDimentions);
+    matrix = gaussianElimination(matrix, matrixDimentions);
+    std::cout << "\nAfter Gaussian" << std::endl;
+    printMatrix(matrix, matrixDimentions);
+    std::cout << "\nSolved values from the matrix" << std::endl;
+    solveMatrix(matrix, matrixDimentions);
     */
     return 0;
 }
