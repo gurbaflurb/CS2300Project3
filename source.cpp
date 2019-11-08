@@ -173,7 +173,16 @@ void solveMatrix(std::vector<float> &matrix, int dimensions) {
                 continue;
             }
             else {
-                solvedValue[count] += currentRow[i];
+                if(currentRow[i] == 0) {
+                    continue;
+                }
+                else if(currentRow[i] > 0) {
+                    solvedValue[count] -= currentRow[i];
+                }
+                else if(currentRow[i] < 0) {
+                    solvedValue[count] += currentRow[i];
+                }
+                
             }
         }
         solvedValue[count] = solvedValue[count]/currentRow[count];
