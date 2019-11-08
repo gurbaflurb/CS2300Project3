@@ -18,6 +18,7 @@ variables to the screen.
 #include <cmath>
 #include <tuple>
 
+bool verbose = false;
 /*
 readData function, takes in a file name as a string for both the prodvec and sysmat files. Then it attempts to open the file and read data from the 
 file in the given format. Then it returns a tuple containing a vector for the data in the file and the dimension of the matrix read in.
@@ -138,8 +139,10 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
            }
             nextColumn = nextColumn+dimensions+1;
         }
-        std::cout << "\nMatrix after Pass " << i+1 << std::endl;
-        printMatrix(matrix, dimensions);
+        if(verbose) {
+            std::cout << "\nMatrix after Pass " << i+1 << std::endl;
+            printMatrix(matrix, dimensions);
+        }
         it = next+1;
         nextColumn = it+dimensions+1;
         next = nextColumn;
@@ -180,13 +183,38 @@ void solveMatrix(std::vector<float> &matrix, int dimensions) {
     for(int i = dimensions-1; i > -1; i--) {
         std::cout << solvedValue[i] << std::endl;
     }
-    
+    std::cout << std::endl;
+}
+
+/*
+printUsage function prints the usage of the program to the screen
+*/
+void printUsage() {
+    std::cout << "Usage:\n$./main [options]" << std::endl;
+    std::cout << "Options\n    -v --verbose | Prints verbose information" << std::endl;
+    std::cout << "    -h --help    | Prints this menu" << std::endl;
+    exit(0);
+}
+
+/*
+parseArgs function parses the user input and either sets the program to be verbose or prints the usage of the program to the user
+*/
+void parseArgs(int argc, char **argv) {
+    if(argc > 1) {
+        if(std::string(argv[1]) == "-h" || std::string(argv[1]) == "--help") {
+            printUsage();
+        }
+        if(std::string(argv[1]) == "-v" || std::string(argv[1]) == "--verbose") {
+            verbose = true;
+        }
+    }
 }
 
 /*
 Start of the main function for the program
 */
-int main() {
+int main(int argc, char **argv) {
+    parseArgs(argc, argv);
     std::vector<float> matrix;
     int matrixDimentions = 0;
     
