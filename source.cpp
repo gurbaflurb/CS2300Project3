@@ -82,11 +82,11 @@ contains said row.
 */
 std::vector<float> makeRow(std::vector<float>::iterator firstColumn, std::vector<float>::iterator secondColumn, int dimensions, int passThrough) {
     std::vector<float> newRow;
-    float firstValue = *(firstColumn+passThrough);
-    float secondValue = *(secondColumn+passThrough);
+    float firstValue = *(firstColumn);
+    float secondValue = *(secondColumn);
     
-    for(int i = passThrough; i < dimensions+1; i++) {
-        float value = (int)((100000*(firstValue*secondColumn[i]))-(100000*(secondValue*firstColumn[i])));
+    for(int i = 0; i < dimensions+1-passThrough; i++) {
+        float value = (unsigned int)((100000*(firstValue*secondColumn[i]))-(100000*(secondValue*firstColumn[i])));
         value = value/100000;
         newRow.push_back(value);
     }
@@ -126,20 +126,23 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
     printMatrix(matrix, dimensions);
     std::vector<float>::iterator it = matrix.begin();
     std::vector<float>::iterator next = it+dimensions+1;
-    std::vector<float>::iterator nextColumn = it+dimensions+1;
+    std::vector<float>::iterator nextColumn = next;
     
     for (int i = 0; i < dimensions-1; i++) {
         for (int j = i; j < dimensions-1; j++) {
             tempMatrix = makeRow(it, nextColumn, dimensions, i);
-            for(int k = 0; k <= dimensions; k++) {
-                nextColumn[k] = tempMatrix[k];
-            }
+           int count = 0;
+           for(std::vector<float>::iterator iterator = tempMatrix.begin(); iterator != tempMatrix.end(); iterator++) {
+               nextColumn[count] = *iterator;
+               count++;
+           }
             nextColumn = nextColumn+dimensions+1;
         }
         std::cout << "\nMatrix after Pass " << i+1 << std::endl;
         printMatrix(matrix, dimensions);
         it = next+1;
         nextColumn = it+dimensions+1;
+        next = nextColumn;
     }
     for(std::vector<float>::iterator iter = matrix.begin(); iter != matrix.end(); iter++) {
         newMatrix.push_back(*iter);
@@ -147,6 +150,10 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
     return newMatrix;
 }
 
+/*
+solveMatrix function is passed a matrix and then attempts to solve said matrix by working backwards to determine all the elements in the matrix and then
+solving the systems of equations using such.
+*/
 void solveMatrix(std::vector<float> &matrix, int dimensions) {
     float solvedValue[dimensions];
     float currentRow[dimensions];
@@ -182,7 +189,7 @@ Start of the main function for the program
 int main() {
     std::vector<float> matrix;
     int matrixDimentions = 0;
-
+    
     std::cout << "Matrix 1" << std::endl;
     std::tie(matrix, matrixDimentions) = readData("sysmat1.txt", "prodvec1.txt");
     printMatrix(matrix, matrixDimentions);
@@ -191,8 +198,7 @@ int main() {
     printMatrix(matrix, matrixDimentions);
     std::cout << "\nSolved values from the matrix" << std::endl;
     solveMatrix(matrix, matrixDimentions);
-
-    /*
+    
     std::cout << "Matrix 2" << std::endl;
     std::tie(matrix, matrixDimentions) = readData("sysmat2.txt", "prodvec2.txt");
     printMatrix(matrix, matrixDimentions);
@@ -201,6 +207,6 @@ int main() {
     printMatrix(matrix, matrixDimentions);
     std::cout << "\nSolved values from the matrix" << std::endl;
     solveMatrix(matrix, matrixDimentions);
-    */
+    
     return 0;
 }
