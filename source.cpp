@@ -78,6 +78,29 @@ void printMatrix(std::vector<float> &matrix, int dimensions) {
 }
 
 /*
+reduce function takes a matrix by reference, the number of dimensions and a pass through value to reduce all the values in the given row. It then returns
+the reduced row.
+*/
+std::vector<float> reduce(std::vector<float> &matrix, int dimensions, int passThrough) {
+    std::vector<float> newRow;
+    int count = 0;
+    std::vector<float>::iterator it = matrix.begin();
+    while(*it == 0) {
+        it++;
+        count++;
+    }
+    float firstValue = *it;
+    for(int i = 0; i < count; i++) {
+        newRow.push_back(0);
+    }
+    for(it; it != matrix.end(); it++) {
+        newRow.push_back(*it/firstValue);
+    }
+
+    return newRow;
+}
+
+/*
 makeRow function takes a pointer to the beginning of two vectors that will be used to determine the row being replaced and return a vector which
 contains said row.
 */
@@ -87,11 +110,10 @@ std::vector<float> makeRow(std::vector<float>::iterator firstColumn, std::vector
     float secondValue = *(secondColumn);
     
     for(int i = 0; i < dimensions+1-passThrough; i++) {
-        float value = (unsigned int)((100000*(firstValue*secondColumn[i]))-(100000*(secondValue*firstColumn[i])));
-        value = value/100000;
+        float value = (firstValue*secondColumn[i]-secondValue*firstColumn[i]);
         newRow.push_back(value);
     }
-
+    newRow = reduce(newRow, dimensions, passThrough);
     return newRow;
 }
 
@@ -132,11 +154,11 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
     for (int i = 0; i < dimensions-1; i++) {
         for (int j = i; j < dimensions-1; j++) {
             tempMatrix = makeRow(it, nextColumn, dimensions, i);
-           int count = 0;
-           for(std::vector<float>::iterator iterator = tempMatrix.begin(); iterator != tempMatrix.end(); iterator++) {
-               nextColumn[count] = *iterator;
-               count++;
-           }
+            int count = 0;
+            for(std::vector<float>::iterator iterator = tempMatrix.begin(); iterator != tempMatrix.end(); iterator++) {
+                nextColumn[count] = *iterator;
+                count++;
+            }
             nextColumn = nextColumn+dimensions+1;
         }
         if(verbose) {
@@ -163,24 +185,25 @@ void solveMatrix(std::vector<float> &matrix, int dimensions) {
     std::fill_n(solvedValue, dimensions, 1);
     int count = 0;
 
-    for (std::vector<float>::iterator it = matrix.end()-1; it != matrix.begin()-1; it--) {
-        solvedValue[count] = *it;
-        for(int i = 1; i < dimensions+1; i++) {
+    for (std::vector<float>::iterator it = matrix.end()-1; it != matrix.begin()-1; it--) { // Loops through all the rows
+        solvedValue[count] = *it; //solved value in array is equal to the value on the right side of the equals sign
+        for(int i = 1; i < dimensions+1; i++) { // fill the current row with the current row we are solving fors values
             currentRow[i-1] = *(it-i);
         }
-        for(int i = 0; i < dimensions; i++) {
+        for(int i = 0; i < dimensions; i++) {// Loop through the current rows values
             if(i == count) {
                 continue;
             }
             else {
+                float value = currentRow[i]*solvedValue[i];
                 if(currentRow[i] == 0) {
                     continue;
                 }
-                else if(currentRow[i] > 0) {
-                    solvedValue[count] -= currentRow[i];
+                else if(value > 0) {
+                    solvedValue[count] -= value;
                 }
-                else if(currentRow[i] < 0) {
-                    solvedValue[count] += currentRow[i];
+                else if(value < 0) {
+                    solvedValue[count] += (-1*value);
                 }
                 
             }
@@ -236,6 +259,9 @@ int main(int argc, char **argv) {
     std::cout << "\nSolved values from the matrix" << std::endl;
     solveMatrix(matrix, matrixDimentions);
     
+    std::cout << "Press enter to run the 10x10 matrix..." << std::endl;
+    std::cin.ignore();
+
     std::cout << "Matrix 2" << std::endl;
     std::tie(matrix, matrixDimentions) = readData("sysmat2.txt", "prodvec2.txt");
     printMatrix(matrix, matrixDimentions);
