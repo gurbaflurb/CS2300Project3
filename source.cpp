@@ -243,33 +243,32 @@ void parseArgs(int argc, char **argv) {
 }
 
 /*
+runGaussian function simply takes in the matrix name, and two file names for the files to be opened. It then runs gaussian elimination on the matrix
+*/
+void runGaussian(std::string matrixRun, std::string file1Name, std::string file2Name) {
+    std::vector<float> matrix;
+    int matrixDimentions = 0;
+    
+    std::cout << matrixRun << std::endl;
+    std::tie(matrix, matrixDimentions) = readData(file1Name, file2Name);
+    printMatrix(matrix, matrixDimentions);
+    matrix = gaussianElimination(matrix, matrixDimentions);
+    std::cout << "\nAfter Gaussian" << std::endl;
+    printMatrix(matrix, matrixDimentions);
+    std::cout << "\nSolved values from the matrix" << std::endl;
+    solveMatrix(matrix, matrixDimentions);
+}
+
+/*
 Start of the main function for the program
 */
 int main(int argc, char **argv) {
     parseArgs(argc, argv);
-    std::vector<float> matrix;
-    int matrixDimentions = 0;
     
-    std::cout << "Matrix 1" << std::endl;
-    std::tie(matrix, matrixDimentions) = readData("sysmat1.txt", "prodvec1.txt");
-    printMatrix(matrix, matrixDimentions);
-    matrix = gaussianElimination(matrix, matrixDimentions);
-    std::cout << "\nAfter Gaussian" << std::endl;
-    printMatrix(matrix, matrixDimentions);
-    std::cout << "\nSolved values from the matrix" << std::endl;
-    solveMatrix(matrix, matrixDimentions);
-    
+    runGaussian("Matrix 1", "sysmat1.txt", "prodvec1.txt");
     std::cout << "Press enter to run the 10x10 matrix..." << std::endl;
     std::cin.ignore();
+    runGaussian("Matrix 2", "sysmat2.txt", "prodvec2.txt");
 
-    std::cout << "Matrix 2" << std::endl;
-    std::tie(matrix, matrixDimentions) = readData("sysmat2.txt", "prodvec2.txt");
-    printMatrix(matrix, matrixDimentions);
-    matrix = gaussianElimination(matrix, matrixDimentions);
-    std::cout << "\nAfter Gaussian" << std::endl;
-    printMatrix(matrix, matrixDimentions);
-    std::cout << "\nSolved values from the matrix" << std::endl;
-    solveMatrix(matrix, matrixDimentions);
-    
     return 0;
 }
