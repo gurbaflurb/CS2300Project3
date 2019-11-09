@@ -1,6 +1,6 @@
 /*
 Sean Chen
-Last modified: Oct. 30, 2019
+Last modified: Nov. 8, 2019
 Written for CS 2300 Sec. 002
 source.cpp
 
@@ -23,7 +23,8 @@ bool verbose = false;
 readData function, takes in a file name as a string for both the prodvec and sysmat files. Then it attempts to open the file and read data from the 
 file in the given format. Then it returns a tuple containing a vector for the data in the file and the dimension of the matrix read in.
 */
-std::tuple<std::vector<float>, int> readData(std::string fileName, std::string productFileName) {
+std::tuple<std::vector<float>, int> readData(std::string fileName, 
+                                             std::string productFileName) {
     std::vector<float> matrix;
     std::fstream file;
     std::fstream file2;
@@ -81,7 +82,8 @@ void printMatrix(std::vector<float> &matrix, int dimensions) {
 reduce function takes a matrix by reference, the number of dimensions and a pass through value to reduce all the values in the given row. It then returns
 the reduced row.
 */
-std::vector<float> reduce(std::vector<float> &matrix, int dimensions, int passThrough) {
+std::vector<float> reduce(std::vector<float> &matrix, int dimensions, 
+                          int passThrough) {
     std::vector<float> newRow;
     int count = 0;
     std::vector<float>::iterator it = matrix.begin();
@@ -104,7 +106,10 @@ std::vector<float> reduce(std::vector<float> &matrix, int dimensions, int passTh
 makeRow function takes a pointer to the beginning of two vectors that will be used to determine the row being replaced and return a vector which
 contains said row.
 */
-std::vector<float> makeRow(std::vector<float>::iterator firstColumn, std::vector<float>::iterator secondColumn, int dimensions, int passThrough) {
+std::vector<float> makeRow(std::vector<float>::iterator firstColumn, 
+                           std::vector<float>::iterator secondColumn, 
+                           int dimensions, 
+                           int passThrough) {
     std::vector<float> newRow;
     float firstValue = *(firstColumn);
     float secondValue = *(secondColumn);
@@ -141,7 +146,8 @@ void pivot(std::vector<float> &matrix, int dimensions) {
 gaussianElimination function takes in a vector and the dimensions for the matrix and then attempts to perform gaussian elimination on the
 matrix and solving the system of equations. 
 */
-std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimensions) {
+std::vector<float> gaussianElimination(std::vector<float> &matrix, 
+                                       int dimensions) {
     std::vector<float> newMatrix;
     std::vector<float> tempMatrix;
     pivot(matrix, dimensions);
@@ -155,7 +161,9 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
         for (int j = i; j < dimensions-1; j++) {
             tempMatrix = makeRow(it, nextColumn, dimensions, i);
             int count = 0;
-            for(std::vector<float>::iterator iterator = tempMatrix.begin(); iterator != tempMatrix.end(); iterator++) {
+            for(std::vector<float>::iterator iterator = tempMatrix.begin(); 
+                iterator != tempMatrix.end(); 
+                iterator++) {
                 nextColumn[count] = *iterator;
                 count++;
             }
@@ -169,7 +177,8 @@ std::vector<float> gaussianElimination(std::vector<float> &matrix, int dimension
         nextColumn = it+dimensions+1;
         next = nextColumn;
     }
-    for(std::vector<float>::iterator iter = matrix.begin(); iter != matrix.end(); iter++) {
+    for(std::vector<float>::iterator iter = matrix.begin(); 
+        iter != matrix.end(); iter++) {
         newMatrix.push_back(*iter);
     }
     return newMatrix;
@@ -185,12 +194,13 @@ void solveMatrix(std::vector<float> &matrix, int dimensions) {
     std::fill_n(solvedValue, dimensions, 1);
     int count = 0;
 
-    for (std::vector<float>::iterator it = matrix.end()-1; it != matrix.begin()-1; it--) { // Loops through all the rows
-        solvedValue[count] = *it; //solved value in array is equal to the value on the right side of the equals sign
-        for(int i = 1; i < dimensions+1; i++) { // fill the current row with the current row we are solving fors values
+    for (std::vector<float>::iterator it = matrix.end()-1;
+         it != matrix.begin()-1; it--) {
+        solvedValue[count] = *it;
+        for(int i = 1; i < dimensions+1; i++) {
             currentRow[i-1] = *(it-i);
         }
-        for(int i = 0; i < dimensions; i++) {// Loop through the current rows values
+        for(int i = 0; i < dimensions; i++) {
             if(i == count) {
                 continue;
             }
@@ -245,7 +255,8 @@ void parseArgs(int argc, char **argv) {
 /*
 runGaussian function simply takes in the matrix name, and two file names for the files to be opened. It then runs gaussian elimination on the matrix
 */
-void runGaussian(std::string matrixRun, std::string file1Name, std::string file2Name) {
+void runGaussian(std::string matrixRun, std::string file1Name, 
+                 std::string file2Name) {
     std::vector<float> matrix;
     int matrixDimentions = 0;
     
